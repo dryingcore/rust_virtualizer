@@ -1,0 +1,40 @@
+use reqwest::Client;
+use serde_json::Value;
+use crate::config;
+use config::load_token::load_token;
+use config::env_config::CONFIG;
+
+pub async fn consultar_linhas(simcard_id: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let token = load_token().ok_or("Token não encontrado")?;
+
+    let client = Client::new();
+    let url = format!("{}{}", CONFIG.consultar_linha_url, simcard_id);
+    let response = client.get(&url).bearer_auth(token).send().await?;
+
+    let body: Value = response.json().await?;
+
+    if body["status"] == 200 {
+        let conteudo = &body["conteudo"];
+
+        let full_caller_id = conteudo["fullCallerId"].as_str().unwrap_or("Desconhecido");
+        let operadora = conteudo["operadora"].as_str().unwrap_or("Desconhecida");
+        let saldo = conteudo["saldo"].as_f64().unwrap_or(0.0);
+        let status_ativo = conteudo["statusAtivo"].as_str().unwrap_or("Indefinido");
+        let iccid = conteudo["iccid"].as_str().unwrap_or("N/A");
+        let plano_dados = conteudo["planoDadosMensal"].as_f64().unwrap_or(0.0);
+        let data_ativacao = conteudo["dataAtivacao"].as_str().unwrap_or("Desconhecida");
+
+        println!("📞 Linha: {}", full_caller_id);
+        println!("🏷️ Operadora: {}", operadora);
+        println!("💰 Saldo: {:.2} MB", saldo);
+        println!("📡 Status: {}", status_ativo);
+        println!("📍 ICCID: {}", iccid);
+        println!("📊 Plano de Dados Mensal: {:.0} MB", plano_dados);
+        println!("🗓️ Data de Ativação: {}", data_ativacao);
+        println!("-----------------------------");
+    } else {
+        println!("❌ Erro ao consultar linhas: {:?}", body);
+    }
+
+    Ok(())
+}
