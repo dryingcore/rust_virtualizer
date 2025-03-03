@@ -1,7 +1,7 @@
 mod config;
 mod functions;
 
-use inquire::Select;
+use inquire::{Select, Text};
 use config::check_env::check_env_variables;
 use config::load_env::load_env_variables;
 use crate::functions::consultar_linhas::consultar_linhas;
@@ -23,19 +23,33 @@ async fn main() {
     loop {
         let options = vec![
             "Consultar Linhas",
-            "Gerar Relatório",
+            "Gerar Relatório",
             "Bloquear Linhas",
             "Desbloquear Linhas",
-            "Ver informações do cliente",
+            "Ver informações do cliente",
             "Sair",
         ];
 
-        let choice = Select::new("Escolha uma opção:", options).prompt();
+        let choice = Select::new("Escolha uma opção:", options).prompt();
 
         match choice {
             Ok("Consultar Linhas") => {
-                if let Err(e) = consultar_linhas("89555480000040720043").await {
-                    println!("Erro ao consultar linhas: {}", e);
+                let input = Text::new("Digite um ou mais IDs de linha separados por vírgula:")
+                    .prompt();
+
+                match input {
+                    Ok(numeros) => {
+                        let ids: Vec<&str> = numeros.split(',').map(|s| s.trim()).collect();
+
+                        for id in ids {
+                            if let Err(e) = consultar_linhas(id).await {
+                                println!("Erro ao consultar linha {}: {}", id, e);
+                            }
+                        }
+                    }
+                    Err(_) => {
+                        println!("Entrada inválida! Tente novamente.");
+                    }
                 }
             },
             Ok("Sair") | _ => {

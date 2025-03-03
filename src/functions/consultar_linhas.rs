@@ -1,6 +1,8 @@
+use crate::functions::generate_csv::write_to_csv;
+use crate::config;
+
 use reqwest::Client;
 use serde_json::Value;
-use crate::config;
 use config::load_token::load_token;
 use config::env_config::CONFIG;
 
@@ -32,6 +34,9 @@ pub async fn consultar_linhas(simcard_id: &str) -> Result<(), Box<dyn std::error
         println!("📊 Plano de Dados Mensal: {:.0} MB", plano_dados);
         println!("🗓️ Data de Ativação: {}", data_ativacao);
         println!("-----------------------------");
+
+        write_to_csv(full_caller_id, operadora, saldo, status_ativo, iccid, plano_dados,
+                     data_ativacao)?;
     } else {
         println!("❌ Erro ao consultar linhas: {:?}", body);
     }
