@@ -1,8 +1,8 @@
-use std::fs::File;
-use std::io::Write;
+use crate::config::env_config::CONFIG;
 use reqwest::Client;
 use serde_json::{json, Value};
-use crate::config::env_config::CONFIG;
+use std::fs::File;
+use std::io::Write;
 
 pub async fn login_request() -> Result<String, Box<dyn std::error::Error>> {
     let login_url = &CONFIG.login_url;
@@ -26,16 +26,15 @@ pub async fn login_request() -> Result<String, Box<dyn std::error::Error>> {
     if let Some(token) = json_response["conteudo"]["token"].as_str() {
         save_token_to_file(token)?;
         println!("Token salvo com sucesso.");
-    }
-    else {
+    } else {
         println!("Token não encontrado na resposta.");
     }
     Ok(response_text)
 }
 
-    fn save_token_to_file(token: &str) -> std::io::Result<()> {
-        let mut file = File::create("token.json")?;
-        let json_data = json!({ "token": token }).to_string();
-        file.write_all(json_data.as_bytes())?;
-        Ok(())
-    }
+fn save_token_to_file(token: &str) -> std::io::Result<()> {
+    let mut file = File::create("token.json")?;
+    let json_data = json!({ "token": token }).to_string();
+    file.write_all(json_data.as_bytes())?;
+    Ok(())
+}

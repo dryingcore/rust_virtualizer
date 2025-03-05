@@ -1,11 +1,11 @@
 mod config;
 mod functions;
 
-use inquire::{Select, Text};
-use config::check_env::check_env_variables;
-use config::load_env::load_env_variables;
 use crate::functions::consultar_linhas::consultar_linhas;
 use crate::functions::login::login_request;
+use config::check_env::check_env_variables;
+use config::load_env::load_env_variables;
+use inquire::{Select, Text};
 
 #[tokio::main]
 async fn main() {
@@ -34,12 +34,12 @@ async fn main() {
 
         match choice {
             Ok("Consultar Linhas") => {
-                let input = Text::new("Digite um ou mais IDs de linha separados por vírgula:")
-                    .prompt();
+                let input =
+                    Text::new("Digite um ou mais IDs de linha separados por vírgula:").prompt();
 
                 match input {
-                    Ok(numeros) => {
-                        let ids: Vec<&str> = numeros.split(',').map(|s| s.trim()).collect();
+                    Ok(numerous) => {
+                        let ids: Vec<&str> = numerous.split(',').map(|s| s.trim()).collect();
 
                         for id in ids {
                             if let Err(e) = consultar_linhas(id).await {
@@ -51,7 +51,7 @@ async fn main() {
                         println!("Entrada inválida! Tente novamente.");
                     }
                 }
-            },
+            }
             Ok("Sair") | _ => {
                 println!("👋 Saindo...");
                 break;

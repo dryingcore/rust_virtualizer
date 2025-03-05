@@ -1,6 +1,8 @@
-use std::fs::{OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
+
 pub fn write_to_csv(
+    nome_cliente: &str,
     full_caller_id: &str,
     operadora: &str,
     saldo: f64,
@@ -8,6 +10,7 @@ pub fn write_to_csv(
     iccid: &str,
     plano_dados: f64,
     data_ativacao: &str,
+    imei: &str,
 ) -> std::io::Result<()> {
     let file_path = "linhas.csv";
 
@@ -20,14 +23,23 @@ pub fn write_to_csv(
     if file.metadata()?.len() == 0 {
         writeln!(
             file,
-            "Linha,Operadora,Saldo (MB),Status,ICCID,Plano de Dados (MB),Data de Ativação"
+            "Cliente,Linha,Operadora,Saldo (MB),Status,ICCID,Plano de Dados (MB),Data de Ativação,\
+            IMEI"
         )?;
     }
 
     writeln!(
         file,
-        "{},{},{:.2},{},{},{:.0},{}",
-        full_caller_id, operadora, saldo, status_ativo, iccid, plano_dados, data_ativacao
+        "{}, {},{},{:.2},{},{},{:.0},{}, {}",
+        nome_cliente,
+        full_caller_id,
+        operadora,
+        saldo,
+        status_ativo,
+        iccid,
+        plano_dados,
+        data_ativacao,
+        imei
     )?;
 
     Ok(())
