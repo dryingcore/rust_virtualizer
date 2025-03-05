@@ -10,7 +10,7 @@ pub async fn consultar_linhas(simcard_id: &str) -> Result<(), Box<dyn std::error
     let token = load_token().ok_or("Token não encontrado")?;
 
     let client = Client::new();
-    let url = format!("{}{}", CONFIG.consultar_linha_url, simcard_id);
+    let url = CONFIG.consultar_linha_url.replace("{}", simcard_id);
     let response = client.get(&url).bearer_auth(token).send().await?;
 
     let body: Value = response.json().await?;

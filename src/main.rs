@@ -3,6 +3,7 @@ mod functions;
 
 use crate::functions::consultar_linhas::consultar_linhas;
 use crate::functions::login::login_request;
+use crate::functions::resetar_linhas::resetar_linhas;
 use config::check_env::check_env_variables;
 use config::load_env::load_env_variables;
 use inquire::{Select, Text};
@@ -23,6 +24,7 @@ async fn main() {
     loop {
         let options = vec![
             "Consultar Linhas",
+            "Resetar Linhas",
             "Gerar Relatório",
             "Bloquear Linhas",
             "Desbloquear Linhas",
@@ -52,6 +54,27 @@ async fn main() {
                     }
                 }
             }
+
+            Ok("Resetar Linhas") => {
+                let input =
+                    Text::new("Digite um ou mais IDs de linhas separados por vírgula").prompt();
+
+                match input {
+                    Ok(numerous) => {
+                        let ids: Vec<&str> = numerous.split(',').map(|s| s.trim()).collect();
+
+                        for id in ids {
+                            if let Err(e) = resetar_linhas(id).await {
+                                println!("Erro ao resetar linha {}: {}", id, e)
+                            }
+                        }
+                    }
+                    Err(_) => {
+                        println!("Entrada inválida! Tente novamente.");
+                    }
+                }
+            }
+
             Ok("Sair") | _ => {
                 println!("👋 Saindo...");
                 break;
